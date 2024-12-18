@@ -1,37 +1,16 @@
-# Development stage
-FROM node:18-slim as development
+FROM node:18-slim
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
 # Install dependencies
+COPY package*.json ./
 RUN npm install
 
 # Copy source
 COPY . .
 
-# Generate Prisma client
-RUN npx prisma generate
+# Expose port
+EXPOSE 4000
 
-# Start development server
-CMD ["npm", "run", "dev"]
-
-# Production stage
-FROM node:18-slim as production
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install production dependencies
-RUN npm install --production
-
-# Copy built files
-COPY --from=development /app/dist ./dist
-COPY --from=development /app/node_modules/.prisma ./node_modules/.prisma
-
-# Start production server
-CMD ["npm", "start"]
+# Start development server with hot reloading
+CMD ["npx", "ts-node-dev", "--respawn", "--transpile-only", "src/index.ts"]
