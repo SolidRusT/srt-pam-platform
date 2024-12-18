@@ -4,6 +4,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { authResolvers } from './modules/auth/resolvers/auth.resolvers';
 import { resolvers as statusResolvers } from './modules/status';
+import { getAuthContext } from './modules/auth/middleware/auth.middleware';
 
 async function startServer() {
   const app = express();
@@ -26,7 +27,10 @@ async function startServer() {
         ...authResolvers.Mutation,
       },
     },
-    context: ({ req }) => ({ req }),
+    context: ({ req }) => ({
+      ...getAuthContext(req),
+      req,
+    }),
   });
 
   await server.start();

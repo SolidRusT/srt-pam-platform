@@ -68,7 +68,7 @@ type Mutation {
   # Authentication
   register(input: RegisterInput!): AuthResponse!
   login(input: LoginInput!): AuthResponse!
-  logout: Boolean!
+  logout(refreshToken: String!): Boolean!
   refreshToken(token: String!): TokenResponse!
   
   # Session Management

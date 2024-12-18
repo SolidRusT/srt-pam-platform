@@ -13,7 +13,7 @@ services:
       PORT: 4000
       DATABASE_URL: postgresql://pam_dev:dev_password@postgres:5432/pam_local
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: dev_jwt_secret
+      JWT_SECRET: your-development-secret-key
       JWT_EXPIRES_IN: 24h
       REFRESH_TOKEN_EXPIRES_IN: 30d
     volumes:

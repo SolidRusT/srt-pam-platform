@@ -1,0 +1,26 @@
+# First login to get your tokens
+mutation Login {
+  login(input: {
+    email: "player@example.com"
+    password: "your-password"
+  }) {
+    accessToken
+    refreshToken
+    player {
+      id
+      username
+    }
+  }
+}
+
+# Set the HTTP Headers with your access token
+# {
+#   "Authorization": "Bearer your-access-token-here"
+# }
+
+# Then use the refresh token to logout
+mutation Logout {
+  logout(refreshToken: "your-refresh-token-here")
+}
+
+# After logout, your tokens will be invalidated and you'll need to login again
