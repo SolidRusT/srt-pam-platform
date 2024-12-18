@@ -22,6 +22,12 @@ type AuthResponse {
   player: Player!
 }
 
+type ServerInfo {
+  status: String!
+  version: String!
+  timestamp: String!
+}
+
 input RegisterInput {
   email: String!
   password: String!
@@ -38,6 +44,7 @@ scalar JSON
 
 type Query {
   me: Player              # Get current authenticated player
+  serverInfo: ServerInfo  # Get server status information
 }
 
 type Mutation {

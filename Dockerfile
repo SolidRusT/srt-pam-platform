@@ -23,6 +23,13 @@ COPY src ./src/
 
 # Generate Prisma Client and GraphQL types
 RUN npx prisma generate
+
+# Create initial migration (without requiring database connection)
+RUN mkdir -p prisma/migrations/0_init
+COPY prisma/schema.prisma prisma/migrations/0_init/migration.sql
+RUN npx prisma migrate resolve --applied 0_init
+
+# Generate GraphQL types
 RUN npx graphql-codegen
 
 # Expose port
