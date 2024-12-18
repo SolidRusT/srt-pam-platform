@@ -1,37 +1,37 @@
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
-import { PrismaClient } from '@prisma/client';
-import { makeExecutableSchema } from '@graphql-tools/schema';
 
-// Basic type definitions - we'll move these to separate files later
+// Basic schema for testing the setup
 const typeDefs = `
   type Query {
-    health: String!
+    hello: String
+    serverInfo: ServerInfo
+  }
+
+  type ServerInfo {
+    status: String!
+    version: String!
+    timestamp: String!
   }
 `;
 
-// Basic resolvers - we'll move these to separate files later
 const resolvers = {
   Query: {
-    health: () => 'PAM Platform is running!',
-  },
+    hello: () => 'Welcome to SolidRusT PAM Platform',
+    serverInfo: () => ({
+      status: 'operational',
+      version: '1.0.0',
+      timestamp: new Date().toISOString()
+    })
+  }
 };
 
 async function startServer() {
   const app = express();
-  const prisma = new PrismaClient();
-
-  const schema = makeExecutableSchema({
+  
+  const server = new ApolloServer({
     typeDefs,
     resolvers,
-  });
-
-  const server = new ApolloServer({
-    schema,
-    context: ({ req }) => ({
-      prisma,
-      req,
-    }),
   });
 
   await server.start();
@@ -39,7 +39,12 @@ async function startServer() {
 
   const port = process.env.PORT || 4000;
   app.listen(port, () => {
-    console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);
+    console.log(`
+    🚀 PAM Platform Server Ready:
+    - GraphQL API:    http://localhost:${port}${server.graphqlPath}
+    - Database UI:    http://localhost:5050
+    - Redis Monitor:  http://localhost:8081
+    `);
   });
 }
 

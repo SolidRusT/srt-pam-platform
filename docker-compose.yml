@@ -1,23 +1,29 @@
 version: '3.8'
 
 services:
+  # Main API Service
   api:
     build:
       context: .
-      target: development
-    volumes:
-      - .:/app
-      - /app/node_modules
+      dockerfile: Dockerfile
     ports:
       - "4000:4000"
     environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgresql://pam_dev:dev_password@postgres:5432/pam_local
-      - REDIS_URL=redis://redis:6379
+      NODE_ENV: development
+      PORT: 4000
+      DATABASE_URL: postgresql://pam_dev:dev_password@postgres:5432/pam_local
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev_jwt_secret
+      JWT_EXPIRES_IN: 24h
+      REFRESH_TOKEN_EXPIRES_IN: 30d
+    volumes:
+      - .:/app
+      - /app/node_modules
     depends_on:
       - postgres
       - redis
 
+  # Database
   postgres:
     image: postgres:14
     environment:
@@ -30,14 +36,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init-scripts:/docker-entrypoint-initdb.d
 
+  # Cache
   redis:
     image: redis:6
     ports:
       - "6379:6379"
-    command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
 
+  # Database Admin
   pgadmin:
     image: dpage/pgadmin4
     environment:
@@ -47,6 +54,16 @@ services:
       - "5050:80"
     depends_on:
       - postgres
+
+  # Redis Admin (Optional)
+  redis-commander:
+    image: rediscommander/redis-commander
+    environment:
+      REDIS_HOSTS: redis
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
 
 volumes:
   postgres_data:
