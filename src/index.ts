@@ -1,29 +1,62 @@
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
+import { PrismaClient } from '@prisma/client';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { AuthService } from './modules/auth/services/auth.service';
+import { authResolvers } from './modules/auth/resolvers/auth.resolvers';
+import * as jwt from 'jsonwebtoken';
 
-// Basic schema for testing the setup
-const typeDefs = `
-  type Query {
-    hello: String
-    serverInfo: ServerInfo
-  }
+// Initialize Prisma
+const prisma = new PrismaClient();
 
-  type ServerInfo {
-    status: String!
-    version: String!
-    timestamp: String!
-  }
-`;
+// Initialize services
+const authService = new AuthService(prisma);
 
+// Read schema
+const typeDefs = readFileSync(
+  join(__dirname, 'graphql', 'schema.graphql'),
+  'utf-8'
+);
+
+// Combine resolvers
 const resolvers = {
   Query: {
-    hello: () => 'Welcome to SolidRusT PAM Platform',
+    ...authResolvers.Query,
     serverInfo: () => ({
       status: 'operational',
       version: '1.0.0',
       timestamp: new Date().toISOString()
     })
+  },
+  Mutation: {
+    ...authResolvers.Mutation
   }
+};
+
+// Context function to handle authentication
+const context = async ({ req }) => {
+  const context = {
+    prisma,
+    authService,
+  };
+
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    const token = authHeader.replace('Bearer ', '');
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      const player = await prisma.player.findUnique({
+        where: { id: decoded.sub },
+      });
+      return { ...context, player };
+    } catch (error) {
+      // Token verification failed
+      return context;
+    }
+  }
+
+  return context;
 };
 
 async function startServer() {
@@ -32,6 +65,7 @@ async function startServer() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+    context,
   });
 
   await server.start();

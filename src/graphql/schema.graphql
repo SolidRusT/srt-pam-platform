@@ -1,0 +1,47 @@
+type Player {
+  id: ID!
+  email: String!
+  username: String!
+  profile: Profile
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Profile {
+  id: ID!
+  playerId: ID!
+  displayName: String
+  avatar: String
+  preferences: JSON
+  updatedAt: DateTime!
+}
+
+type AuthResponse {
+  accessToken: String!
+  refreshToken: String!
+  player: Player!
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
+  username: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+scalar DateTime
+scalar JSON
+
+type Query {
+  me: Player              # Get current authenticated player
+}
+
+type Mutation {
+  register(input: RegisterInput!): AuthResponse!
+  login(input: LoginInput!): AuthResponse!
+  logout: Boolean!
+}

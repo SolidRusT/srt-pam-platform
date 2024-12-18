@@ -1,0 +1,74 @@
+# Registration
+mutation Register {
+  register(input: {
+    email: "test@example.com"
+    password: "password123"
+    username: "testuser"
+  }) {
+    accessToken
+    refreshToken
+    player {
+      id
+      email
+      username
+    }
+  }
+}
+
+# Login
+mutation Login {
+  login(input: {
+    email: "test@example.com"
+    password: "password123"
+  }) {
+    accessToken
+    refreshToken
+    player {
+      id
+      email
+      username
+    }
+  }
+}
+
+# Get Current User Profile
+# Note: Add Authorization header with value: Bearer <your-access-token>
+query Me {
+  me {
+    id
+    email
+    username
+  }
+}
+
+# Logout
+mutation Logout {
+  logout
+}
+
+# Example response shapes:
+
+# Successful Register/Login Response:
+# {
+#   "data": {
+#     "register": {  # or "login"
+#       "accessToken": "eyJhbGc...",
+#       "refreshToken": "eyJhbGc...",
+#       "player": {
+#         "id": "123e4567-e89b-12d3-a456-426614174000",
+#         "email": "test@example.com",
+#         "username": "testuser"
+#       }
+#     }
+#   }
+# }
+
+# Error Response Example:
+# {
+#   "errors": [
+#     {
+#       "message": "Invalid credentials",
+#       "path": ["login"]
+#     }
+#   ]
+# }
