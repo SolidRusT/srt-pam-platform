@@ -2,6 +2,7 @@ import { AuthService } from '../services/auth.service';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { redisService } from '../../../shared/services/redis.service';
+import { createHash } from 'crypto';
 
 const prisma = new PrismaClient();
 const authService = new AuthService();
@@ -10,7 +11,6 @@ export const authResolvers = {
   Query: {
     me: async (_, __, { req }) => {
       try {
-        // Get token from header
         const authHeader = req.headers.authorization;
         console.log('Auth header:', authHeader);
 
@@ -38,7 +38,6 @@ export const authResolvers = {
             throw new Error('Invalid token type');
           }
 
-          // Get player
           const player = await prisma.player.findUnique({
             where: { id: decoded.sub },
             include: { profile: true },
@@ -148,6 +147,23 @@ export const authResolvers = {
             throw new Error('Invalid refresh token');
           }
 
+          // Verify the refresh token exists in active sessions
+          const hashedToken = createHash('sha256').update(refreshToken).digest('hex');
+          const activeSession = await prisma.session.findFirst({
+            where: {
+              token: hashedToken,
+              playerId: decoded.sub,
+              expiresAt: {
+                gt: new Date()
+              }
+            }
+          });
+
+          if (!activeSession) {
+            console.log('Refresh token not found in active sessions');
+            throw new Error('Invalid refresh token');
+          }
+
           // Calculate remaining time until token expires
           const expiryTime = redisService.getTokenExpiryTime(accessToken);
           
@@ -220,7 +236,7 @@ export const authResolvers = {
           const session = await prisma.session.findFirst({
             where: {
               playerId: decoded.sub,
-              token: this.hashToken(token),
+              token: createHash('sha256').update(token).digest('hex'),
             },
           });
           currentSessionId = session?.id;
