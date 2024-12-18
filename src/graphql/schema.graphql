@@ -3,6 +3,7 @@ type Player {
   email: String!
   username: String!
   profile: Profile
+  sessions: [Session!]!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -16,10 +17,25 @@ type Profile {
   updatedAt: DateTime!
 }
 
+type Session {
+  id: ID!
+  playerId: ID!
+  lastActive: DateTime!
+  expiresAt: DateTime!
+  userAgent: String
+  ipAddress: String
+  createdAt: DateTime!
+}
+
 type AuthResponse {
   accessToken: String!
   refreshToken: String!
   player: Player!
+}
+
+type TokenResponse {
+  accessToken: String!
+  refreshToken: String!
 }
 
 type ServerInfo {
@@ -43,12 +59,19 @@ scalar DateTime
 scalar JSON
 
 type Query {
-  me: Player              # Get current authenticated player
-  serverInfo: ServerInfo  # Get server status information
+  me: Player                           # Get current authenticated player
+  serverInfo: ServerInfo              # Get server status information
+  activeSessions: [Session!]!         # Get all active sessions for current player
 }
 
 type Mutation {
+  # Authentication
   register(input: RegisterInput!): AuthResponse!
   login(input: LoginInput!): AuthResponse!
   logout: Boolean!
+  refreshToken(token: String!): TokenResponse!
+  
+  # Session Management
+  revokeSession(sessionId: ID!): Boolean!
+  revokeAllSessions(exceptCurrentSession: Boolean): Boolean!
 }

@@ -15,13 +15,13 @@ RUN npm install
 COPY tsconfig.json .
 COPY codegen.yml .
 
-# Copy prisma schema
+# Copy prisma schema and migrations
 COPY prisma ./prisma/
 
 # Copy source files
 COPY src ./src/
 
-# Generate Prisma Client (this doesn't require DATABASE_URL)
+# Generate Prisma Client
 RUN npx prisma generate
 
 # Generate GraphQL types

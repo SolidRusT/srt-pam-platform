@@ -30,10 +30,16 @@ model Profile {
 }
 
 model Session {
-  id        String   @id @default(uuid())
-  playerId  String
-  player    Player   @relation(fields: [playerId], references: [id])
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
+  id         String    @id @default(uuid())
+  playerId   String
+  player     Player    @relation(fields: [playerId], references: [id])
+  token      String    @unique // Stores hashed refresh token
+  userAgent  String?
+  ipAddress  String?
+  lastActive DateTime  @default(now()) @updatedAt
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+
+  @@index([playerId])
+  @@index([token])
 }
