@@ -1,0 +1,58 @@
+# First, login to get your token:
+mutation Login {
+  login(input: {
+    email: "player@example.com"
+    password: "your-password"
+  }) {
+    accessToken
+    refreshToken
+    player {
+      id
+      username
+    }
+  }
+}
+
+# Set the HTTP Headers in GraphQL Playground:
+# {
+#   "Authorization": "Bearer your-access-token-here"
+# }
+
+# Then you can run authenticated queries:
+
+query Me {
+  me {
+    id
+    email
+    username
+    createdAt
+    updatedAt
+    profile {
+      displayName
+      avatar
+    }
+  }
+}
+
+mutation Logout {
+  logout
+}
+
+# Get active sessions
+query ActiveSessions {
+  activeSessions {
+    id
+    lastActive
+    userAgent
+    ipAddress
+    createdAt
+  }
+}
+
+# You can also refresh your token when it's about to expire:
+mutation RefreshToken {
+  refreshToken(token: "your-refresh-token-here") {
+    accessToken
+    refreshToken
+  }
+}

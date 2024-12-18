@@ -3,6 +3,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { authResolvers } from './modules/auth/resolvers/auth.resolvers';
+import { resolvers as statusResolvers } from './modules/status';
 
 async function startServer() {
   const app = express();
@@ -19,6 +20,7 @@ async function startServer() {
     resolvers: {
       Query: {
         ...authResolvers.Query,
+        ...statusResolvers.Query,
       },
       Mutation: {
         ...authResolvers.Mutation,

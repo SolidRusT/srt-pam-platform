@@ -1,0 +1,18 @@
+query ServerInfo {
+  serverInfo {
+    status
+    version
+    timestamp
+  }
+}
+
+# Example response:
+# {
+#   "data": {
+#     "serverInfo": {
+#       "status": "operational",
+#       "version": "1.0.0",
+#       "timestamp": "2024-02-21T12:34:56.789Z"
+#     }
+#   }
+# }
