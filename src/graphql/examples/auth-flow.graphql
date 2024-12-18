@@ -1,178 +1,42 @@
-# Complete Authentication Flow Examples
-# =================================
-
-# 1. Register New Player
-# ---------------------
-mutation Register {
-  register(input: {
-    email: "player@example.com"
-    password: "secure_password_123"
-    username: "player1"
-  }) {
-    accessToken
-    refreshToken
-    player {
-      id
-      email
-      username
-      createdAt
-    }
-  }
-}
-
-# Expected response:
-# {
-#   "data": {
-#     "register": {
-#       "accessToken": "eyJhbG...",
-#       "refreshToken": "eyJhb...",
-#       "player": {
-#         "id": "...",
-#         "email": "player@example.com",
-#         "username": "player1",
-#         "createdAt": "2024-..." 
-#       }
-#     }
-#   }
-# }
-
-# 2. Login Existing Player
-# -----------------------
+# Step 1: Login to get tokens
 mutation Login {
   login(input: {
     email: "player@example.com"
-    password: "secure_password_123"
+    password: "your-password"
   }) {
-    accessToken
-    refreshToken
+    accessToken    # Save this for Authorization header
+    refreshToken   # Save this for logout
     player {
       id
-      email
       username
     }
   }
 }
 
-# 3. Get Current Player Profile
-# ---------------------------
-# Headers: { "Authorization": "Bearer your_access_token" }
-query CurrentPlayer {
+# Step 2: Set Authorization header
+# {
+#   "Authorization": "Bearer your-access-token-from-login"
+# }
+
+# Step 3: Verify you're logged in
+query Me {
   me {
     id
     email
     username
-    profile {
-      displayName
-      avatar
-      preferences
-    }
-    createdAt
-    updatedAt
   }
 }
 
-# 4. View Active Sessions
-# ----------------------
-# Headers: { "Authorization": "Bearer your_access_token" }
-query ActiveSessions {
-  activeSessions {
-    id
-    userAgent
-    ipAddress
-    lastActive
-    expiresAt
-    createdAt
-  }
-}
-
-# 5. Refresh Token
-# ---------------
-mutation RefreshToken {
-  refreshToken(token: "your_refresh_token_here") {
-    accessToken
-    refreshToken
-  }
-}
-
-# 6. Revoke Specific Session
-# -------------------------
-# Headers: { "Authorization": "Bearer your_access_token" }
-mutation RevokeSession {
-  revokeSession(sessionId: "session_id_here")
-}
-
-# 7. Revoke All Other Sessions
-# ---------------------------
-# Headers: { "Authorization": "Bearer your_access_token" }
-mutation RevokeOtherSessions {
-  revokeAllSessions(exceptCurrentSession: true)
-}
-
-# 8. Logout
-# ---------
-# Headers: { "Authorization": "Bearer your_access_token" }
+# Step 4: Logout using refresh token
 mutation Logout {
-  logout
+  logout(refreshToken: "your-refresh-token-from-login")
 }
 
-# Error Examples and Handling
-# ==========================
-
-# 1. Invalid Login
-mutation InvalidLogin {
-  login(input: {
-    email: "player@example.com"
-    password: "wrong_password"
-  }) {
-    accessToken
-    refreshToken
-    player {
-      id
-    }
-  }
-}
-# Expected error:
-# {
-#   "errors": [
-#     {
-#       "message": "Invalid credentials",
-#       "path": ["login"]
-#     }
-#   ]
-# }
-
-# 2. Invalid Token
-# Headers: { "Authorization": "Bearer invalid_token" }
-query InvalidTokenExample {
+# Step 5: Verify you're logged out by trying Me query again
+# (should fail with "Not authenticated")
+query VerifyLogout {
   me {
     id
+    username
   }
 }
-# Expected error:
-# {
-#   "errors": [
-#     {
-#       "message": "Not authenticated",
-#       "path": ["me"]
-#     }
-#   ]
-# }
-
-# Complete Authentication Flow Example
-# ==================================
-# This shows how the operations should be used in sequence:
-
-# 1. Register new player (use Register mutation)
-# 2. Store returned tokens
-# 3. Use accessToken in Authorization header for authenticated requests
-# 4. When accessToken expires, use refreshToken to get new tokens
-# 5. For security, periodically check active sessions
-# 6. When done, use logout to invalidate the session
-
-# Tips for Testing
-# ===============
-# 1. Keep track of tokens between operations
-# 2. Set Authorization header for authenticated requests
-# 3. Test error cases to ensure proper handling
-# 4. Check session management after login/logout
-# 5. Verify token refresh works before access token expires
