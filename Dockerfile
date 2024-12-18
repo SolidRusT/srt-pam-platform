@@ -31,7 +31,7 @@ RUN npx graphql-codegen
 EXPOSE 4000
 
 # Start script that will run migrations and start the server
-COPY scripts/start.sh .
+COPY start.sh .
 RUN chmod +x start.sh
 
 CMD ["./start.sh"]
