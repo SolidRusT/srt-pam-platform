@@ -55,6 +55,21 @@ input LoginInput {
   password: String!
 }
 
+type ResetPasswordResponse {
+  success: Boolean!
+  message: String!
+}
+
+type VerifyResetTokenResponse {
+  valid: Boolean!
+  email: String
+}
+
+input ResetPasswordInput {
+  token: String!
+  newPassword: String!
+}
+
 scalar DateTime
 scalar JSON
 
@@ -62,6 +77,7 @@ type Query {
   me: Player                           # Get current authenticated player
   serverInfo: ServerInfo              # Get server status information
   activeSessions: [Session!]!         # Get all active sessions for current player
+  verifyResetToken(token: String!): VerifyResetTokenResponse!  # Verify password reset token
 }
 
 type Mutation {
@@ -74,4 +90,8 @@ type Mutation {
   # Session Management
   revokeSession(sessionId: ID!): Boolean!
   revokeAllSessions(exceptCurrentSession: Boolean): Boolean!
+
+  # Password Reset
+  requestPasswordReset(email: String!): Boolean!
+  resetPassword(input: ResetPasswordInput!): ResetPasswordResponse!
 }

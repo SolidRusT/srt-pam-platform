@@ -3,6 +3,8 @@ import { useAuth } from './lib/AuthContext';
 import { AuthDemo } from './features/auth/AuthDemo';
 import { Profile } from './features/profile/Profile';
 import { Layout } from './components/Layout';
+import { RequestReset } from './features/auth/password-reset/RequestReset';
+import { ResetPassword } from './features/auth/password-reset/ResetPassword';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { isAuthenticated } = useAuth();
@@ -38,6 +40,10 @@ export function AppRoutes() {
             ? <AuthDemo initialTab="register" /> 
             : <Navigate to="/profile" replace />
         } />
+        
+        {/* Password Reset routes */}
+        <Route path="forgot-password" element={<RequestReset />} />
+        <Route path="reset-password" element={<ResetPassword />} />
         
         {/* Protected routes */}
         <Route path="profile" element={

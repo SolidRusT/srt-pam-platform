@@ -3,10 +3,12 @@ import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { redisService } from '../../../shared/services/redis.service';
 import { createHash } from 'crypto';
+import { passwordResetResolvers } from './password-reset.resolver';
 
 const prisma = new PrismaClient();
 const authService = new AuthService();
 
+// Merge the password reset resolvers with the main auth resolvers
 export const authResolvers = {
   Query: {
     me: async (_, __, { req }) => {
@@ -74,6 +76,9 @@ export const authResolvers = {
         throw new Error('Not authenticated');
       }
     },
+
+    // Add password reset query resolver
+    ...passwordResetResolvers.Query,
   },
 
   Mutation: {
@@ -247,5 +252,8 @@ export const authResolvers = {
         throw new Error('Not authenticated');
       }
     },
+
+    // Add password reset mutation resolvers
+    ...passwordResetResolvers.Mutation,
   },
 };

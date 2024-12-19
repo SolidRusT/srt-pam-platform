@@ -235,4 +235,54 @@ export class AuthClient {
     }
     return false;
   }
+
+  async requestPasswordReset(email: string): Promise<boolean> {
+    const { data } = await this.client.mutate({
+      mutation: gql`
+        mutation RequestPasswordReset($email: String!) {
+          requestPasswordReset(email: $email)
+        }
+      `,
+      variables: { email }
+    });
+
+    return data?.requestPasswordReset || false;
+  }
+
+  async verifyResetToken(token: string): Promise<{ valid: boolean; email?: string }> {
+    const { data } = await this.client.query({
+      query: gql`
+        query VerifyResetToken($token: String!) {
+          verifyResetToken(token: $token) {
+            valid
+            email
+          }
+        }
+      `,
+      variables: { token }
+    });
+
+    return data?.verifyResetToken || { valid: false };
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<boolean> {
+    const { data } = await this.client.mutate({
+      mutation: gql`
+        mutation ResetPassword($input: ResetPasswordInput!) {
+          resetPassword(input: $input) {
+            success
+            message
+          }
+        }
+      `,
+      variables: {
+        input: {
+          token,
+          newPassword
+        }
+      }
+    });
+
+    return data?.resetPassword?.success || false;
+  }
 }

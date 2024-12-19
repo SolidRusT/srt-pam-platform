@@ -8,6 +8,9 @@ interface AuthContextType {
   register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (displayName: string, avatar?: string) => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<boolean>;
+  verifyResetToken: (token: string) => Promise<{ valid: boolean; email?: string }>;
+  resetPassword: (token: string, newPassword: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -57,6 +60,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const requestPasswordReset = async (email: string) => {
+    return authClient.requestPasswordReset(email);
+  };
+
+  const verifyResetToken = async (token: string) => {
+    return authClient.verifyResetToken(token);
+  };
+
+  const resetPassword = async (token: string, newPassword: string) => {
+    return authClient.resetPassword(token, newPassword);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -66,6 +81,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         register,
         logout,
         updateProfile,
+        requestPasswordReset,
+        verifyResetToken,
+        resetPassword,
       }}
     >
       {children}

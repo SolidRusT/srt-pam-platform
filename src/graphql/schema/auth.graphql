@@ -1,0 +1,25 @@
+type Mutation {
+  # Existing mutations...
+  requestPasswordReset(email: String!): Boolean!
+  resetPassword(input: ResetPasswordInput!): ResetPasswordResponse!
+}
+
+type Query {
+  # Existing queries...
+  verifyResetToken(token: String!): VerifyResetTokenResponse!
+}
+
+input ResetPasswordInput {
+  token: String!
+  newPassword: String!
+}
+
+type ResetPasswordResponse {
+  success: Boolean!
+  message: String!
+}
+
+type VerifyResetTokenResponse {
+  valid: Boolean!
+  email: String
+}
