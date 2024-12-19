@@ -1,14 +1,21 @@
 import { ApolloClient, gql } from '@apollo/client';
 import { apolloClient } from './apollo';
 
+export interface Profile {
+  displayName?: string;
+  avatar?: string;
+  bio?: string;
+  preferences?: {
+    emailNotifications: boolean;
+    pushNotifications: boolean;
+  };
+}
+
 export interface Player {
   id: string;
   email: string;
   username: string;
-  profile?: {
-    displayName?: string;
-    avatar?: string;
-  };
+  profile?: Profile;
 }
 
 export interface Session {
@@ -65,6 +72,8 @@ export class AuthClient {
               profile {
                 displayName
                 avatar
+                bio
+                preferences
               }
             }
           }
@@ -97,6 +106,8 @@ export class AuthClient {
               profile {
                 displayName
                 avatar
+                bio
+                preferences
               }
             }
           }
@@ -146,6 +157,8 @@ export class AuthClient {
             profile {
               displayName
               avatar
+              bio
+              preferences
             }
           }
         }
@@ -156,22 +169,59 @@ export class AuthClient {
     return data?.me || null;
   }
 
-  async updateProfile(displayName: string, avatar?: string) {
+  async updateProfile(displayName: string, avatar?: string, bio?: string) {
     const { data } = await this.client.mutate({
       mutation: gql`
         mutation UpdateProfile($input: UpdateProfileInput!) {
           updateProfile(input: $input) {
             displayName
             avatar
+            bio
+            preferences
           }
         }
       `,
       variables: {
-        input: { displayName, avatar }
+        input: { displayName, avatar, bio }
       }
     });
 
     return data?.updateProfile;
+  }
+
+  async updatePassword(currentPassword: string, newPassword: string): Promise<boolean> {
+    const { data } = await this.client.mutate({
+      mutation: gql`
+        mutation UpdatePassword($input: UpdatePasswordInput!) {
+          updatePassword(input: $input) {
+            success
+            message
+          }
+        }
+      `,
+      variables: {
+        input: { currentPassword, newPassword }
+      }
+    });
+
+    return data?.updatePassword?.success || false;
+  }
+
+  async updateNotificationPreferences(preferences: { emailNotifications: boolean; pushNotifications: boolean }) {
+    const { data } = await this.client.mutate({
+      mutation: gql`
+        mutation UpdatePreferences($input: UpdatePreferencesInput!) {
+          updatePreferences(input: $input) {
+            preferences
+          }
+        }
+      `,
+      variables: {
+        input: { preferences }
+      }
+    });
+
+    return data?.updatePreferences?.preferences;
   }
 
   async getActiveSessions(): Promise<Session[]> {

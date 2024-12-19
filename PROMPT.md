@@ -10,8 +10,6 @@ My current workflow for working on the project is this:
 
 When any changes to the API are made, I go to the UI at: `http://localhost:4000/graphql` and update the tests in the `src/graphql/examples` folder, then run the tests.
 
-For our react app in the `client` folder, I can successfully run `npm install && npm run dev` and get the app to run in the browser on http://localhost:3000/. We haven't integrated this into our `docker-compose.yml` file yet.
-
 Current features that are confirmed to be working, or at least that I have manually tested successfully:
 
 - GraphQL API

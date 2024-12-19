@@ -13,8 +13,15 @@ type Profile {
   playerId: ID!
   displayName: String
   avatar: String
-  preferences: JSON
+  bio: String
+  preferences: ProfilePreferences
   updatedAt: DateTime!
+}
+
+type ProfilePreferences {
+  emailNotifications: Boolean
+  pushNotifications: Boolean
+  theme: String
 }
 
 type Session {
@@ -44,6 +51,21 @@ type ServerInfo {
   timestamp: String!
 }
 
+type ResetPasswordResponse {
+  success: Boolean!
+  message: String!
+}
+
+type VerifyResetTokenResponse {
+  valid: Boolean!
+  email: String
+}
+
+type UpdatePasswordResponse {
+  success: Boolean!
+  message: String!
+}
+
 input RegisterInput {
   email: String!
   password: String!
@@ -55,14 +77,21 @@ input LoginInput {
   password: String!
 }
 
-type ResetPasswordResponse {
-  success: Boolean!
-  message: String!
+input UpdateProfileInput {
+  displayName: String
+  avatar: String
+  bio: String
 }
 
-type VerifyResetTokenResponse {
-  valid: Boolean!
-  email: String
+input UpdatePasswordInput {
+  currentPassword: String!
+  newPassword: String!
+}
+
+input UpdatePreferencesInput {
+  emailNotifications: Boolean
+  pushNotifications: Boolean
+  theme: String
 }
 
 input ResetPasswordInput {
@@ -75,8 +104,8 @@ scalar JSON
 
 type Query {
   me: Player                           # Get current authenticated player
-  serverInfo: ServerInfo              # Get server status information
-  activeSessions: [Session!]!         # Get all active sessions for current player
+  serverInfo: ServerInfo               # Get server status information
+  activeSessions: [Session!]!          # Get all active sessions for current player
   verifyResetToken(token: String!): VerifyResetTokenResponse!  # Verify password reset token
 }
 
@@ -86,6 +115,11 @@ type Mutation {
   login(input: LoginInput!): AuthResponse!
   logout(refreshToken: String!): Boolean!
   refreshToken(token: String!): TokenResponse!
+  
+  # Profile Management
+  updateProfile(input: UpdateProfileInput!): Profile!
+  updatePassword(input: UpdatePasswordInput!): UpdatePasswordResponse!
+  updatePreferences(input: UpdatePreferencesInput!): Profile!
   
   # Session Management
   revokeSession(sessionId: ID!): Boolean!
