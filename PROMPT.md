@@ -1,8 +1,8 @@
 OK, so I would like to continue working on our PAM project, in the `C:\Users\shaun\repos\srt-pam-platform` folder.
 
-So far, I am able to follow the instructions in the `README.md` and bring up the docker compose environment. I am able to hit all the endpoints mentioned in the `README.md` file.
+So far, I have been able to follow the instructions in the `README.md` file and bring up the docker compose environment. I am also able to hit all the endpoints mentioned in the `README.md` file.
 
-Let's make an assessment of what we currently have in our repo so far, and figure our what to focus on next. By the end of this sprint, I need to be able to register a user, login and get a valid token, logout and delete the token.
+Let's make an assessment of what we currently have in our repo so far, and figure our what to focus on next. By the end of this sprint, I need to have an example react app working with our GraphQL API.
 
 My current workflow for working on the GraphQL API is this:
 
