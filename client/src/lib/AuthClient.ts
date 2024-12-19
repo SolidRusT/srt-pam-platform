@@ -116,16 +116,23 @@ export class AuthClient {
   }
 
   async logout() {
-    if (this.accessToken) {
-      await this.client.mutate({
-        mutation: gql`
-          mutation Logout {
-            logout
+    if (this.refreshToken) {
+      try {
+        await this.client.mutate({
+          mutation: gql`
+            mutation Logout($refreshToken: String!) {
+              logout(refreshToken: $refreshToken)
+            }
+          `,
+          variables: {
+            refreshToken: this.refreshToken
           }
-        `
-      });
+        });
+      } finally {
+        // Clear tokens even if the mutation fails
+        this.clearTokens();
+      }
     }
-    this.clearTokens();
   }
 
   async getProfile(): Promise<Player | null> {
