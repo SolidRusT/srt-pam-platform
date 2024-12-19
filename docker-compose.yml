@@ -21,6 +21,21 @@ services:
       - postgres
       - redis
 
+  # Client Application
+  client:
+    build:
+      context: ./client
+      target: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=/graphql
+    depends_on:
+      - api
+
   # Database
   postgres:
     image: postgres:16
